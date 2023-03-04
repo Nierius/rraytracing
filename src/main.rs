@@ -53,7 +53,7 @@ fn write_img() {
     println!("P3\n{IMAGE_WIDTH} {IMAGE_HEIGHT}\n255");
     for y in (0..IMAGE_HEIGHT).rev() {
         eprintln!("Scanlines remaining: {y}");
-        io::stderr().flush().unwrap();
+        io::stderr().flush().unwrap_or_default();
         for x in 0..IMAGE_WIDTH {
             let mut pixel_color = Color::new([0.0, 0.0, 0.0]);
             for _ in 0..SAMPLES_PER_PIXEL {
