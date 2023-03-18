@@ -13,7 +13,8 @@ pub fn write_color(color: Color, samples_per_pixel: f32) {
 
 // TODO BETTER NAMING
 fn multivalue_to_unnormalized(val: f32, samples_per_pixel: f32) -> i16 {
-    let divided_val = val / samples_per_pixel;
+    // sqrt for Gamma correction (2.0)
+    let divided_val = (val / samples_per_pixel).sqrt();
     (256.0 * clamp(divided_val, 0.0, 0.999)) as i16
 }
 
