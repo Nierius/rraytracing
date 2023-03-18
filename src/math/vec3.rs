@@ -1,5 +1,7 @@
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
+use super::random::Random;
+
 #[derive(Debug, Copy, Clone)]
 pub struct Vec3 {
     pub e: [f32; 3],
@@ -23,7 +25,11 @@ impl Vec3 {
     }
 
     pub fn length(&self) -> f32 {
-        (self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]).sqrt()
+        self.length_squared().sqrt()
+    }
+
+    pub fn length_squared(&self) -> f32 {
+        self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]
     }
 
     pub fn dot(&self, other: &Vec3) -> f32 {
@@ -32,6 +38,29 @@ impl Vec3 {
 
     pub fn unit_vector(&self) -> Vec3 {
         self / self.length()
+    }
+
+    /** RECURSIVE */
+    pub fn random_in_unit_sphere() -> Vec3 {
+        loop {
+            let random = Vec3::random_clamped(-1.0, 1.0);
+            if random.length_squared() < 1.0 {
+                return random;
+            }
+        }
+    }
+
+    pub fn random_unit_vector() -> Vec3 {
+        Vec3::random_in_unit_sphere().unit_vector()
+    }
+
+    pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
+        let in_unit_sphere = Vec3::random_in_unit_sphere();
+        if in_unit_sphere.dot(normal) > 0.0 {
+            return in_unit_sphere;
+        }
+
+        -in_unit_sphere
     }
 }
 
