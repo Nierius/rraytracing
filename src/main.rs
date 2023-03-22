@@ -2,7 +2,10 @@ mod math;
 mod scene;
 mod shapes;
 mod util;
-use std::io::{self, Write};
+use std::{
+    io::{self, Write},
+    rc::Rc,
+};
 
 use math::vec3::Vec3;
 use shapes::traits::Hit;
@@ -12,6 +15,7 @@ use util::{
 };
 
 use crate::{
+    materials::{lambertian::Lambertian, metal::Metal},
     math::random::rand_f32,
     scene::camera::Camera,
     shapes::{hit_collection::HitCollection, sphere::Sphere},
@@ -114,6 +118,20 @@ fn write_img() {
     const IMAGE_HEIGHT: i16 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as i16;
     const SAMPLES_PER_PIXEL: i16 = 100; // This anti-aliasing makes it very very slow
     const MAX_DEPTH: i16 = 50;
+
+    // Materials
+    let mat_ground = Rc::new(Lambertian {
+        albedo: Color::new([0.8, 0.8, 0.0]),
+    });
+    let mat_center = Rc::new(Lambertian {
+        albedo: Color::new([0.7, 0.3, 0.3]),
+    });
+    let mat_left = Rc::new(Metal {
+        albedo: Color::new([0.8, 0.8, 0.8]),
+    });
+    let mat_right = Rc::new(Metal {
+        albedo: Color::new([0.8, 0.6, 0.2]),
+    });
 
     // World
     let mut world = HitCollection::default();
