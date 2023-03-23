@@ -7,7 +7,7 @@ use super::material::Material;
 use super::scatter_record::ScatterRecord;
 
 pub struct Lambertian {
-    albedo: Color,
+    pub albedo: Color,
 }
 
 impl Material for Lambertian {
