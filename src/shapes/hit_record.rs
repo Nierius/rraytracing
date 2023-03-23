@@ -1,14 +1,17 @@
+use std::rc::Rc;
+
 use crate::{
+    materials::material::Material,
     math::vec3::Vec3,
     util::{point::Point, ray::Ray},
 };
 
-#[derive(Debug)]
 pub struct HitRecord {
     pub point: Point,
     pub normal: Vec3,
     pub t: f32,
     pub front_face: bool,
+    pub material: Rc<dyn Material>,
 }
 
 pub fn is_front_face(ray: &Ray, outward_normal: &Vec3) -> bool {

@@ -1,3 +1,4 @@
+mod materials;
 mod math;
 mod scene;
 mod shapes;
@@ -100,6 +101,32 @@ fn ray_color_hemisphere(ray: &Ray, world: &HitCollection, depth: i16) -> Color {
     Color::new([1.0, 1.0, 1.0]) * (1.0 - t) + Color::new([0.5, 0.7, 1.0]) * t
 }
 
+fn ray_color_material(ray: &Ray, world: &HitCollection, depth: i16) -> Color {
+    // Recursion protection
+    if depth <= 0 {
+        return Color::default();
+    }
+
+    let hit_res = world.hit(ray, 0.001, f32::MAX);
+    match hit_res {
+        Some(hit) => {
+            let scatter_res = hit.material.scatter(ray, &hit);
+            match scatter_res {
+                Some(scatter) => {
+                    return scatter.attenuation
+                        * ray_color_material(&scatter.scattered_ray, world, depth - 1)
+                }
+                None => return Color::new([0.0, 0.0, 0.0]),
+            }
+        }
+        None => (),
+    }
+
+    let unit_direction = ray.unit_direction();
+    let t = 0.5 * (unit_direction.y() + 1.0);
+    Color::new([1.0, 1.0, 1.0]) * (1.0 - t) + Color::new([0.5, 0.7, 1.0]) * t
+}
+
 fn ray_color(ray: &Ray, world: &HitCollection) -> Color {
     let hit_res = world.hit(ray, 0.001, f32::MAX);
     match hit_res {
@@ -135,10 +162,25 @@ fn write_img() {
 
     // World
     let mut world = HitCollection::default();
-    world.add(Box::new(Sphere::new(Point::new([0.0, 0.0, -1.0]), 0.5)));
     world.add(Box::new(Sphere::new(
         Point::new([0.0, -100.5, -1.0]),
         100.0,
+        mat_ground,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point::new([-1.0, 0.0, -1.0]),
+        0.5,
+        mat_left,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point::new([0.0, 0.0, -1.0]),
+        0.5,
+        mat_center,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point::new([1.0, 0.0, -1.0]),
+        0.5,
+        mat_right,
     )));
 
     // Camera
@@ -157,9 +199,10 @@ fn write_img() {
 
                 //pixel_color = pixel_color + ray_color(&ray, &world);
                 //pixel_color = pixel_color + ray_color_random_direction(&ray, &world, MAX_DEPTH);
-                pixel_color =
-                    pixel_color + ray_color_random_direction_lambertian(&ray, &world, MAX_DEPTH);
+                //pixel_color =
+                //    pixel_color + ray_color_random_direction_lambertian(&ray, &world, MAX_DEPTH);
                 //pixel_color = pixel_color + ray_color_hemisphere(&ray, &world, MAX_DEPTH);
+                pixel_color = pixel_color + ray_color_material(&ray, &world, MAX_DEPTH);
             }
 
             write_color(pixel_color, SAMPLES_PER_PIXEL.into());
