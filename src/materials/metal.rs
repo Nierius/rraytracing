@@ -4,7 +4,7 @@ use crate::{
     util::{color::Color, ray::Ray},
 };
 
-use super::{material::Material, scatter_record::ScatterRecord};
+use super::{interactions::reflect, material::Material, scatter_record::ScatterRecord};
 
 pub struct Metal {
     pub albedo: Color,
@@ -30,8 +30,4 @@ impl Material for Metal {
             attenuation,
         })
     }
-}
-
-fn reflect(vec: Vec3, normal: Vec3) -> Vec3 {
-    return (vec - 2.0) * vec.dot(&normal) * normal;
 }
