@@ -1,10 +1,14 @@
 use crate::{
-    math::vec3::Vec3,
+    math::{random::rand_f32, vec3::Vec3},
     shapes::hit_record::HitRecord,
     util::{color::Color, ray::Ray},
 };
 
-use super::{material::Material, scatter_record::ScatterRecord};
+use super::{
+    interactions::{reflect, refract},
+    material::Material,
+    scatter_record::ScatterRecord,
+};
 
 pub struct Dielectric {
     pub refraction_index: f32,
@@ -19,24 +23,31 @@ impl Material for Dielectric {
             self.refraction_index
         };
 
-        let refracted = refract(
-            Vec3::unit_vector(&ray_in.direction()),
-            &hit_rec.normal,
-            refraction_ratio,
-        );
+        let unit_direction = Vec3::unit_vector(&ray_in.direction());
+        let cos_theta = f32::min((-unit_direction).dot(&hit_rec.normal), 1.0);
+        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+
+        let can_refract = refraction_ratio * sin_theta <= 1.0;
+
+        let direction = if !can_refract || reflectance(cos_theta, refraction_ratio) > rand_f32() {
+            refract(unit_direction, &hit_rec.normal, refraction_ratio)
+        } else {
+            reflect(unit_direction, &hit_rec.normal)
+        };
 
         Some(ScatterRecord {
-            scattered_ray: Ray::new(hit_rec.point, refracted),
+            scattered_ray: Ray::new(hit_rec.point, direction),
             attenuation,
         })
     }
 }
 
-fn refract(unit_vec: Vec3, normal: &Vec3, refraction_ratio: f32) -> Vec3 {
-    let cos_theta = f32::min((-unit_vec).dot(normal), 1.0);
+/**
+ * Schlick's approximation
+ */
+fn reflectance(cos: f32, refraction_ratio: f32) -> f32 {
+    let r = (1.0 - refraction_ratio) / (1.0 + refraction_ratio);
+    let r_pow = r * r;
 
-    let ray_out_perpendicular = (unit_vec + normal * cos_theta) * refraction_ratio;
-    let ray_out_parallel = normal * -((1.0 - ray_out_perpendicular.length_squared()).abs()).sqrt();
-
-    ray_out_perpendicular + ray_out_parallel
+    r_pow + (1.0 - r_pow) * (1.0 - cos).powi(5)
 }

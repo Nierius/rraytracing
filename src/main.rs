@@ -15,7 +15,7 @@ use util::{
 };
 
 use crate::{
-    materials::{lambertian::Lambertian, metal::Metal},
+    materials::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal},
     math::random::rand_f32,
     scene::camera::Camera,
     shapes::{hit_collection::HitCollection, sphere::Sphere},
@@ -66,9 +66,8 @@ fn write_img() {
     let mat_center = Rc::new(Lambertian {
         albedo: Color::new([0.7, 0.3, 0.3]),
     });
-    let mat_left = Rc::new(Metal {
-        albedo: Color::new([0.8, 0.8, 0.8]),
-        fuzziness: 0.3,
+    let mat_left = Rc::new(Dielectric {
+        refraction_index: 1.5,
     });
     let mat_right = Rc::new(Metal {
         albedo: Color::new([0.8, 0.6, 0.2]),

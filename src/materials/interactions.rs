@@ -9,6 +9,6 @@ pub fn refract(unit_vec: Vec3, normal: &Vec3, refraction_ratio: f32) -> Vec3 {
     ray_out_perpendicular + ray_out_parallel
 }
 
-pub fn reflect(vec: Vec3, normal: Vec3) -> Vec3 {
-    return (vec - 2.0) * vec.dot(&normal) * normal;
+pub fn reflect(vec: Vec3, normal: &Vec3) -> Vec3 {
+    return (vec - 2.0) * vec.dot(normal) * normal;
 }

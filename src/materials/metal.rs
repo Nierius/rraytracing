@@ -13,7 +13,7 @@ pub struct Metal {
 
 impl Material for Metal {
     fn scatter(&self, ray_in: &Ray, hit_rec: &HitRecord) -> Option<ScatterRecord> {
-        let reflected = reflect(ray_in.unit_direction(), hit_rec.normal);
+        let reflected = reflect(ray_in.unit_direction(), &hit_rec.normal);
 
         let scattered_ray = Ray::new(
             hit_rec.point,
