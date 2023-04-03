@@ -1,6 +1,6 @@
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
-use super::random::Random;
+use super::random::{rand_f32_clamped, Random};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vec3 {
@@ -58,6 +58,20 @@ impl Vec3 {
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
             let random = Vec3::random_clamped(-1.0, 1.0);
+            if random.length_squared() < 1.0 {
+                return random;
+            }
+        }
+    }
+
+    /** LOOPS UNTIL ONE FOUND */
+    pub fn random_in_unit_disk() -> Vec3 {
+        loop {
+            let random = Vec3::new([
+                rand_f32_clamped(-1.0, 1.0),
+                rand_f32_clamped(-1.0, 1.0),
+                0.0,
+            ]);
             if random.length_squared() < 1.0 {
                 return random;
             }
