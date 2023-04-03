@@ -4,6 +4,7 @@ mod scene;
 mod shapes;
 mod util;
 use std::{
+    f32::consts::PI,
     io::{self, Write},
     rc::Rc,
 };
@@ -16,7 +17,7 @@ use util::{
 
 use crate::{
     materials::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal},
-    math::random::rand_f32,
+    math::{random::rand_f32, vec3::Vec3},
     scene::camera::Camera,
     shapes::{hit_collection::HitCollection, sphere::Sphere},
     util::point::Point,
@@ -98,7 +99,13 @@ fn write_img() {
     )));
 
     // Camera
-    let camera = Camera::new();
+    let camera = Camera::new(
+        Point::new([-2.0, 2.0, 1.0]),
+        Point::new([0.0, 0.0, -1.0]),
+        Vec3::new([0.0, 1.0, 0.0]),
+        PI / 2.0,
+        ASPECT_RATIO,
+    );
 
     println!("P3\n{IMAGE_WIDTH} {IMAGE_HEIGHT}\n255");
     for y in (0..IMAGE_HEIGHT).rev() {
