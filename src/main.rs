@@ -9,6 +9,8 @@ use std::{
     rc::Rc,
 };
 
+use materials::material::Material;
+use math::random::{rand_f32_clamped, Random};
 use shapes::traits::Hit;
 use util::{
     color::{write_color, Color},
@@ -54,10 +56,10 @@ fn ray_color_material(ray: &Ray, world: &HitCollection, depth: i16) -> Color {
 }
 
 fn write_img() {
-    const ASPECT_RATIO: f32 = 16.0 / 9.0;
-    const IMAGE_WIDTH: i16 = 400;
+    const ASPECT_RATIO: f32 = 3.0 / 2.0;
+    const IMAGE_WIDTH: i16 = 1200;
     const IMAGE_HEIGHT: i16 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as i16;
-    const SAMPLES_PER_PIXEL: i16 = 100; // This anti-aliasing makes it very very slow
+    const SAMPLES_PER_PIXEL: i16 = 500; // This anti-aliasing makes it very very slow
     const MAX_DEPTH: i16 = 50;
 
     // Materials
@@ -76,34 +78,41 @@ fn write_img() {
     });
 
     // World
-    let mut world = HitCollection::default();
-    world.add(Box::new(Sphere::new(
-        Point::new([0.0, -100.5, -1.0]),
-        100.0,
-        mat_ground,
-    )));
-    world.add(Box::new(Sphere::new(
-        Point::new([-1.0, 0.0, -1.0]),
-        0.5,
-        mat_left,
-    )));
-    world.add(Box::new(Sphere::new(
-        Point::new([0.0, 0.0, -1.0]),
-        0.5,
-        mat_center,
-    )));
-    world.add(Box::new(Sphere::new(
-        Point::new([1.0, 0.0, -1.0]),
-        0.5,
-        mat_right,
-    )));
+    let world = random_scene();
+    //let mut world = HitCollection::default();
+    //world.add(Box::new(Sphere::new(
+    //    Point::new([0.0, -100.5, -1.0]),
+    //    100.0,
+    //    mat_ground,
+    //)));
+    //world.add(Box::new(Sphere::new(
+    //    Point::new([-1.0, 0.0, -1.0]),
+    //    0.5,
+    //    mat_left.clone(),
+    //)));
+    //world.add(Box::new(Sphere::new(
+    //    Point::new([-1.0, 0.0, -1.0]),
+    //    -0.45,
+    //    mat_left,
+    //)));
+    //world.add(Box::new(Sphere::new(
+    //    Point::new([0.0, 0.0, -1.0]),
+    //    0.5,
+    //    mat_center,
+    //)));
+    //world.add(Box::new(Sphere::new(
+    //    Point::new([1.0, 0.0, -1.0]),
+    //    0.5,
+    //    mat_right,
+    //)));
 
     // Camera
-    let look_from = Point::new([3.0, 3.0, 2.0]);
-    let look_at = Point::new([0.0, 0.0, -1.0]);
+    let look_from = Point::new([13.0, 2.0, 3.0]);
+    let look_at = Point::new([0.0, 0.0, 0.0]);
     let view_up = Vec3::new([0.0, 1.0, 0.0]);
-    let dist_to_focus = (look_from - look_at).length();
-    let aperture = 2.0;
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+
     let camera = Camera::new(
         look_from,
         look_at,
@@ -132,4 +141,84 @@ fn write_img() {
         }
     }
     eprintln!("All done.");
+}
+
+fn random_scene() -> HitCollection {
+    let mut world = HitCollection::default();
+
+    let mat_ground = Rc::new(Lambertian {
+        albedo: Color::new([0.5, 0.5, 0.5]),
+    });
+
+    world.add(Box::new(Sphere::new(
+        Point::new([0.0, -1000.0, 0.0]),
+        1000.0,
+        mat_ground,
+    )));
+
+    let border_point = Point::new([4.0, 0.2, 0.0]);
+    for i in -11..11 {
+        for j in -11..11 {
+            let material = random_material();
+            let center = Point::new([
+                0.9 * rand_f32() + i as f32,
+                0.2,
+                0.9 * rand_f32() + j as f32,
+            ]);
+            if (center - border_point).length() <= 0.9 {
+                continue;
+            }
+
+            world.add(Box::new(Sphere::new(center, 0.2, material)));
+        }
+    }
+
+    let mat_1 = Rc::new(Dielectric {
+        refraction_index: 1.5,
+    });
+    let mat_2 = Rc::new(Lambertian {
+        albedo: Color::new([0.4, 0.2, 0.1]),
+    });
+    let mat_3 = Rc::new(Metal {
+        albedo: Color::new([0.4, 0.2, 0.1]),
+        fuzziness: 0.0,
+    });
+
+    world.add(Box::new(Sphere::new(
+        Point::new([0.0, 1.0, 0.0]),
+        1.0,
+        mat_1,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point::new([-4.0, 1.0, 0.0]),
+        1.0,
+        mat_2,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point::new([4.0, 1.0, 0.0]),
+        1.0,
+        mat_3,
+    )));
+
+    world
+}
+
+fn random_material() -> Rc<dyn Material> {
+    let rand = rand_f32();
+    if rand < 0.8 {
+        return Rc::new(Lambertian {
+            albedo: Color::random() * Color::random(),
+        });
+    }
+
+    if rand < 0.95 {
+        return Rc::new(Metal {
+            albedo: Color::random_clamped(0.5, 1.0),
+            fuzziness: rand_f32_clamped(0.0, 0.5),
+        });
+    }
+
+    Rc::new(Dielectric {
+        refraction_index: 1.5,
+    })
 }
