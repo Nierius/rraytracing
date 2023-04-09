@@ -180,7 +180,7 @@ fn random_scene() -> HitCollection {
         albedo: Color::new([0.4, 0.2, 0.1]),
     });
     let mat_3 = Rc::new(Metal {
-        albedo: Color::new([0.4, 0.2, 0.1]),
+        albedo: Color::new([0.7, 0.6, 0.5]),
         fuzziness: 0.0,
     });
 
