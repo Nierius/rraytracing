@@ -7,7 +7,11 @@ use crate::{
     math::{random::rand_f32, vec3::Vec3},
     scene::camera::Camera,
     shapes::{hit_collection::HitCollection, sphere::Sphere, traits::Hit},
-    util::{color::Color, point::Point, ray::Ray},
+    util::{
+        color::{sampled_value_to_normalized, Color},
+        point::Point,
+        ray::Ray,
+    },
 };
 
 fn ray_color_material(ray: &Ray, world: &HitCollection, depth: i16) -> Color {
@@ -124,16 +128,9 @@ impl Render for Renderer {
         }
 
         shared::data::Pixel::new_f32(
-            multivalue_to_unnormalized(pixel_color.x(), SAMPLES_PER_PIXEL.into()),
-            multivalue_to_unnormalized(pixel_color.y(), SAMPLES_PER_PIXEL.into()),
-            multivalue_to_unnormalized(pixel_color.z(), SAMPLES_PER_PIXEL.into()),
+            sampled_value_to_normalized(pixel_color.x(), SAMPLES_PER_PIXEL.into()),
+            sampled_value_to_normalized(pixel_color.y(), SAMPLES_PER_PIXEL.into()),
+            sampled_value_to_normalized(pixel_color.z(), SAMPLES_PER_PIXEL.into()),
         )
     }
-}
-
-fn multivalue_to_unnormalized(val: f32, samples_per_pixel: f32) -> f32 {
-    // sqrt for Gamma correction (2.0)
-    let divided_val = (val / samples_per_pixel).sqrt();
-    assert!(divided_val <= 1.0 && divided_val >= 0.0);
-    divided_val
 }

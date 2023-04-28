@@ -11,10 +11,7 @@ use std::{
 };
 
 use shapes::traits::Hit;
-use util::{
-    color::{write_color, Color},
-    ray::Ray,
-};
+use util::{color::Color, ray::Ray};
 
 use crate::{
     materials::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal},
@@ -129,7 +126,8 @@ fn write_img() {
                 pixel_color = pixel_color + ray_color_material(&ray, &world, MAX_DEPTH);
             }
 
-            write_color(pixel_color, SAMPLES_PER_PIXEL.into());
+            // TODO MAKE THIS CLI OPTION
+            // write_color(pixel_color, SAMPLES_PER_PIXEL.into());
         }
     }
     eprintln!("All done.");
