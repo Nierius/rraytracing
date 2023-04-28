@@ -1,5 +1,6 @@
 mod materials;
 mod math;
+mod renderer;
 mod scene;
 mod shapes;
 mod util;

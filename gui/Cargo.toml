@@ -1,5 +1,5 @@
 [package]
-name = "renderer"
+name = "gui"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,4 +7,8 @@ edition = "2021"
 
 [dependencies]
 rand = "0.8.5"
+relm4 = "0.5.1"
+relm4-components = "0.5.1"
+renderer = { version = "0.1.0", path = "../renderer" }
 shared = { version = "0.1.0", path = "../shared" }
+tokio = { version = "1.27.0", features = ["time"] }
