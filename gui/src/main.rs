@@ -3,7 +3,6 @@ use std::time::Duration;
 use gtk::cairo::Context;
 use gtk::prelude::*;
 use relm4::drawing::DrawHandler;
-use relm4::gtk::cairo::{Matrix, Rectangle};
 use relm4::{gtk, Component, ComponentParts, ComponentSender, RelmApp, RelmWidgetExt};
 use renderer::renderer::renderer::Renderer;
 use shared::traits::Render;
@@ -100,11 +99,11 @@ impl Component for App {
 }
 
 fn draw(cx: &Context, width: i32, height: i32) {
-    let renderer = Renderer {};
+    let renderer = Renderer::default();
     for i in 0..height {
         for j in 0..width {
-            println!("Attemptin to draw {} {}", i, j);
-            let pixel = renderer.render_pixel(shared::data::Scene {}, j, i, width, height);
+            println!("Attempting to draw {} {}", i, j);
+            let pixel = renderer.render_pixel(j, i, width, height);
             cx.set_source_rgb(pixel.r, pixel.g, pixel.b);
             cx.rectangle(j as f64, i as f64, 1.0, 1.0);
             cx.fill().expect("Couldn't fill rect");
