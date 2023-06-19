@@ -37,6 +37,8 @@ fn ray_color_material(ray: &Ray, world: &HitCollection, depth: i16) -> Color {
 }
 
 const MAX_RECURSION_DEPTH: i16 = 50;
+// TODO: Make this variable
+const SAMPLES_PER_PIXEL: i16 = 10;
 
 pub struct Renderer {
     scene: Scene,
@@ -44,7 +46,18 @@ pub struct Renderer {
 
 impl Render for Renderer {
     fn render(&self, frame_width: i32, frame_height: i32) -> shared::data::Frame {
-        todo!()
+        let mut pixels = vec![];
+        for y in 0..frame_height {
+            for x in 0..frame_width {
+                pixels.push(self.render_pixel(x, y, frame_width, frame_height))
+            }
+        }
+
+        shared::data::Frame {
+            pixels,
+            height: frame_height,
+            width: frame_width,
+        }
     }
 
     fn render_pixel(
@@ -54,8 +67,6 @@ impl Render for Renderer {
         frame_width: i32,
         frame_height: i32,
     ) -> shared::data::Pixel {
-        const SAMPLES_PER_PIXEL: i16 = 10; // This anti-aliasing makes it very very slow
-
         let mut pixel_color = Color::default();
         for _ in 0..SAMPLES_PER_PIXEL {
             let u = (x as f32 + rand_f32()) / (frame_width - 1) as f32;
