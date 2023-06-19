@@ -1,3 +1,4 @@
+// TODO Async versions
 pub trait Render {
     fn render(&self, frame_width: i32, frame_height: i32) -> crate::data::Frame;
 

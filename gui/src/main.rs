@@ -2,8 +2,9 @@ use std::time::Duration;
 
 use gtk::cairo::Context;
 use gtk::prelude::*;
+use relm4::component::{AsyncComponent, AsyncComponentParts};
 use relm4::drawing::DrawHandler;
-use relm4::{gtk, Component, ComponentParts, ComponentSender, RelmApp, RelmWidgetExt};
+use relm4::{gtk, AsyncComponentSender, RelmApp, RelmWidgetExt};
 use renderer::renderer::renderer::Renderer;
 use shared::traits::Render;
 
@@ -22,8 +23,8 @@ struct App {
     handler: DrawHandler,
 }
 
-#[relm4::component]
-impl Component for App {
+#[relm4::component(async)]
+impl AsyncComponent for App {
     type Init = ();
     type Input = Msg;
     type Output = ();
@@ -57,11 +58,14 @@ impl Component for App {
       }
     }
 
-    fn update(&mut self, msg: Msg, _sender: ComponentSender<Self>, _root: &Self::Root) {
+    async fn update(&mut self, msg: Msg, _sender: AsyncComponentSender<Self>, _root: &Self::Root) {
         let cx = self.handler.get_context();
 
         match msg {
-            Msg::Render => draw(&cx, self.width, self.height),
+            Msg::Render => {
+                let frame = tokio::spawn(render(self.width, self.height)).await.unwrap();
+                draw(&cx, frame);
+            }
             Msg::Resize((x, y)) => {
                 self.width = x;
                 self.height = y;
@@ -69,11 +73,11 @@ impl Component for App {
         }
     }
 
-    fn init(
+    async fn init(
         _: Self::Init,
-        root: &Self::Root,
-        sender: ComponentSender<Self>,
-    ) -> ComponentParts<Self> {
+        root: Self::Root,
+        sender: AsyncComponentSender<Self>,
+    ) -> AsyncComponentParts<Self> {
         let model = App {
             width: 100,
             height: 100,
@@ -94,25 +98,34 @@ impl Component for App {
                 .drop_on_shutdown()
         });
 
-        ComponentParts { model, widgets }
+        AsyncComponentParts { model, widgets }
     }
 }
 
-fn draw(cx: &Context, width: i32, height: i32) {
+async fn render(width: i32, height: i32) -> shared::data::Frame {
     let renderer = Renderer::default();
-    for i in 0..height {
-        for j in 0..width {
-            let y = height - i - 1;
-            println!("Attempting to draw {} {}", y, j);
-            let pixel = renderer.render_pixel(j, y, width, height);
-            cx.set_source_rgb(pixel.r, pixel.g, pixel.b);
-            cx.rectangle(j as f64, i as f64, 1.0, 1.0);
-            cx.fill().expect("Couldn't fill rect");
+    renderer.render(width, height)
+}
+
+fn draw(cx: &Context, frame: shared::data::Frame) {
+    let frame_iter = frame.pixels.into_iter();
+    let mut y = frame.height - 1;
+    let mut x = 0;
+
+    for pixel in frame_iter {
+        cx.set_source_rgb(pixel.r, pixel.g, pixel.b);
+        cx.rectangle(x as f64, y as f64, 1.0, 1.0);
+        cx.fill().expect("Couldn't fill rect");
+
+        x += 1;
+        if x == frame.width {
+            y -= 1;
+            x = 0;
         }
     }
 }
 
 fn main() {
     let app = RelmApp::new(env!("CARGO_PKG_NAME"));
-    app.run::<App>(());
+    app.run_async::<App>(());
 }
