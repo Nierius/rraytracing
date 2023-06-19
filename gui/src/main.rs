@@ -112,6 +112,6 @@ fn draw(cx: &Context, width: i32, height: i32) {
 }
 
 fn main() {
-    let app = RelmApp::new("nierius.raytracing.gui");
+    let app = RelmApp::new(env!("CARGO_PKG_NAME"));
     app.run::<App>(());
 }
