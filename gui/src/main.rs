@@ -102,8 +102,9 @@ fn draw(cx: &Context, width: i32, height: i32) {
     let renderer = Renderer::default();
     for i in 0..height {
         for j in 0..width {
-            println!("Attempting to draw {} {}", i, j);
-            let pixel = renderer.render_pixel(j, i, width, height);
+            let y = height - i - 1;
+            println!("Attempting to draw {} {}", y, j);
+            let pixel = renderer.render_pixel(j, y, width, height);
             cx.set_source_rgb(pixel.r, pixel.g, pixel.b);
             cx.rectangle(j as f64, i as f64, 1.0, 1.0);
             cx.fill().expect("Couldn't fill rect");
