@@ -37,19 +37,22 @@ fn ray_color_material(ray: &Ray, world: &HitCollection, depth: i16) -> Color {
 }
 
 const MAX_RECURSION_DEPTH: i16 = 50;
-// TODO: Make this variable
-const SAMPLES_PER_PIXEL: i16 = 10;
 
 pub struct Renderer {
     scene: Scene,
 }
 
 impl Render for Renderer {
-    fn render(&self, frame_width: i32, frame_height: i32) -> shared::data::Frame {
+    fn render(
+        &self,
+        frame_width: i32,
+        frame_height: i32,
+        samples_per_pixel: i16,
+    ) -> shared::data::Frame {
         let mut pixels = vec![];
         for y in 0..frame_height {
             for x in 0..frame_width {
-                pixels.push(self.render_pixel(x, y, frame_width, frame_height))
+                pixels.push(self.render_pixel(x, y, frame_width, frame_height, samples_per_pixel))
             }
         }
 
@@ -66,9 +69,10 @@ impl Render for Renderer {
         y: i32,
         frame_width: i32,
         frame_height: i32,
+        samples_per_pixel: i16,
     ) -> shared::data::Pixel {
         let mut pixel_color = Color::default();
-        for _ in 0..SAMPLES_PER_PIXEL {
+        for _ in 0..samples_per_pixel {
             let u = (x as f32 + rand_f32()) / (frame_width - 1) as f32;
             let v = (y as f32 + rand_f32()) / (frame_height - 1) as f32;
             let ray = self.scene.camera.get_ray(u, v);
@@ -78,9 +82,9 @@ impl Render for Renderer {
         }
 
         shared::data::Pixel {
-            r: sampled_value_to_normalized(pixel_color.x(), SAMPLES_PER_PIXEL.into()).into(),
-            g: sampled_value_to_normalized(pixel_color.y(), SAMPLES_PER_PIXEL.into()).into(),
-            b: sampled_value_to_normalized(pixel_color.z(), SAMPLES_PER_PIXEL.into()).into(),
+            r: sampled_value_to_normalized(pixel_color.x(), samples_per_pixel.into()).into(),
+            g: sampled_value_to_normalized(pixel_color.y(), samples_per_pixel.into()).into(),
+            b: sampled_value_to_normalized(pixel_color.z(), samples_per_pixel.into()).into(),
         }
     }
 }

@@ -21,6 +21,9 @@ struct Cli {
 
     #[arg(long, default_value_t = 225, value_parser = clap::value_parser!(i32).range(2..))]
     height: i32,
+
+    #[arg(short, long, default_value_t = 10, value_parser = clap::value_parser!(i16).range(5..200))]
+    samples_per_pixel: i16,
 }
 
 fn main() {
@@ -29,16 +32,17 @@ fn main() {
         cli.filename.unwrap_or("out.ppm".to_string()),
         cli.width,
         cli.height,
+        cli.samples_per_pixel,
     );
 }
 
-fn write_img(file: String, width: i32, height: i32) {
+fn write_img(file: String, width: i32, height: i32, samples_per_pixel: i16) {
     println!(
-        "Rendering image to file {} with size {}:{}",
-        file, width, height
+        "Rendering image to file {} with size {}:{}. Samples per pixel: {}",
+        file, width, height, samples_per_pixel
     );
     let renderer = Renderer::default();
-    let frame = renderer.render(width, height);
+    let frame = renderer.render(width, height, samples_per_pixel);
     let frame_str = frame
         .pixels
         .chunks(width as usize) // Divide into rows
