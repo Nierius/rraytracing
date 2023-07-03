@@ -40,3 +40,8 @@ cargo run --bin gui // Running gui in debug mode
 cargo run --bin renderer // Running CLI in debug mode
 cargo run --bin renderer -- -h // To see CLI options
 ```
+
+## Requirements (build & dev)
+
+- Gtk4 installed with development headers
+- Cargo and Rust installed
