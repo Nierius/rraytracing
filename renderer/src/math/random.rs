@@ -1,8 +1,14 @@
 use super::vec3::Vec3;
-use rand::Rng;
+use rand::{rngs::ThreadRng, Rng};
+
+static mut RNG: Option<ThreadRng> = None;
+
+unsafe fn get_rng() -> &'static mut ThreadRng {
+    RNG.get_or_insert_with(ThreadRng::default)
+}
 
 pub fn rand_f32() -> f32 {
-    let mut rng = rand::thread_rng();
+    let rng = unsafe { get_rng() };
     rng.gen()
 }
 
@@ -10,7 +16,7 @@ pub fn rand_f32() -> f32 {
  * Inclusive clamping
  */
 pub fn rand_f32_clamped(min: f32, max: f32) -> f32 {
-    let mut rng = rand::thread_rng();
+    let rng = unsafe { get_rng() };
     rng.gen_range(min..=max)
 }
 
