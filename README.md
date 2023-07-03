@@ -15,6 +15,10 @@ RRaytracing is minimal raytracing implementation with both CLI and GUI user inte
 - Defocus blur
 - Positionable camera (currently hardcoded position)
 
+## Project structure
+
+Project uses single monorepo whichs hosts 3 workspaces. Workspaces are shared, gui and renderer. Shared contains common interfaces  and datatypes which can be used to communicate with renderer. Gui is the graphical user interface project and renderer is the machine which takes scene in and outputs an image.
+
 ## Ideas for further development
 
 - Unit tests
