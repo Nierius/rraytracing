@@ -54,7 +54,6 @@ impl Vec3 {
             && self.z().abs() < f32::EPSILON;
     }
 
-    /** LOOPS UNTIL ONE FOUND */
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
             let random = Vec3::random_clamped(-1.0, 1.0);
@@ -64,7 +63,6 @@ impl Vec3 {
         }
     }
 
-    /** LOOPS UNTIL ONE FOUND */
     pub fn random_in_unit_disk() -> Vec3 {
         loop {
             let random = Vec3::new([

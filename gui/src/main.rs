@@ -18,9 +18,6 @@ enum Msg {
     SampleAmountChanged(f64),
 }
 
-#[derive(Debug)]
-struct UpdatePointsMsg;
-
 struct App {
     width: i32,
     height: i32,
@@ -33,7 +30,7 @@ impl AsyncComponent for App {
     type Init = ();
     type Input = Msg;
     type Output = ();
-    type CommandOutput = UpdatePointsMsg;
+    type CommandOutput = ();
 
     view! {
       gtk::Window {
@@ -128,7 +125,7 @@ impl AsyncComponent for App {
                 .register(async move {
                     loop {
                         tokio::time::sleep(Duration::from_millis(20)).await;
-                        out.send(UpdatePointsMsg).unwrap();
+                        out.send(()).unwrap();
                     }
                 })
                 .drop_on_shutdown()

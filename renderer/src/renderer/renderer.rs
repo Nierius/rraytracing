@@ -10,32 +10,6 @@ use crate::{
     },
 };
 
-fn ray_color_material(ray: &Ray, world: &HitCollection, depth: i16) -> Color {
-    // Recursion protection
-    if depth <= 0 {
-        return Color::default();
-    }
-
-    let hit_res = world.hit(ray, 0.001, f32::MAX);
-    match hit_res {
-        Some(hit) => {
-            let scatter_res = hit.material.scatter(ray, &hit);
-            match scatter_res {
-                Some(scatter) => {
-                    return scatter.attenuation
-                        * ray_color_material(&scatter.scattered_ray, world, depth - 1)
-                }
-                None => return Color::default(),
-            }
-        }
-        None => (),
-    }
-
-    let unit_direction = ray.unit_direction();
-    let t = 0.5 * (unit_direction.y() + 1.0);
-    Color::new([1.0, 1.0, 1.0]) * (1.0 - t) + Color::new([0.5, 0.7, 1.0]) * t
-}
-
 const MAX_RECURSION_DEPTH: i16 = 50;
 
 pub struct Renderer {
@@ -95,4 +69,30 @@ impl Default for Renderer {
             scene: Default::default(),
         }
     }
+}
+
+fn ray_color_material(ray: &Ray, world: &HitCollection, depth: i16) -> Color {
+    // Recursion protection
+    if depth <= 0 {
+        return Color::default();
+    }
+
+    let hit_res = world.hit(ray, 0.001, f32::MAX);
+    match hit_res {
+        Some(hit) => {
+            let scatter_res = hit.material.scatter(ray, &hit);
+            match scatter_res {
+                Some(scatter) => {
+                    return scatter.attenuation
+                        * ray_color_material(&scatter.scattered_ray, world, depth - 1)
+                }
+                None => return Color::default(),
+            }
+        }
+        None => (),
+    }
+
+    let unit_direction = ray.unit_direction();
+    let t = 0.5 * (unit_direction.y() + 1.0);
+    Color::new([1.0, 1.0, 1.0]) * (1.0 - t) + Color::new([0.5, 0.7, 1.0]) * t
 }

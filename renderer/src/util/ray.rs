@@ -27,5 +27,3 @@ impl Ray {
         self.direction.unit_vector()
     }
 }
-
-// TESTS

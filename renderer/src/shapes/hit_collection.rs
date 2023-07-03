@@ -1,5 +1,3 @@
-// TODO BETTER NAMING
-
 use crate::util::ray::Ray;
 
 use super::{hit_record::HitRecord, traits::Hit};
