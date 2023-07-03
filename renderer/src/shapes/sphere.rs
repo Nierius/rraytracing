@@ -12,6 +12,33 @@ pub struct Sphere {
     pub material: Rc<dyn Material>,
 }
 
+impl Sphere {
+    pub fn new(center: Vec3, radius: f32, material: Rc<dyn Material>) -> Self {
+        Self {
+            center,
+            radius,
+            material,
+        }
+    }
+
+    fn root_to_hit_record(&self, root: f32, ray: &Ray) -> HitRecord {
+        let point = ray.at(root);
+        let normal = (point - self.center) / self.radius;
+        let is_front_face = is_front_face(&ray, &normal);
+
+        HitRecord {
+            point,
+            normal: match is_front_face {
+                true => normal,
+                false => -normal,
+            },
+            t: root,
+            front_face: is_front_face,
+            material: self.material.clone(),
+        }
+    }
+}
+
 impl Hit for Sphere {
     fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let oc = ray.origin() - self.center;
@@ -39,32 +66,5 @@ impl Hit for Sphere {
         }
 
         None
-    }
-}
-
-impl Sphere {
-    pub fn new(center: Vec3, radius: f32, material: Rc<dyn Material>) -> Self {
-        Self {
-            center,
-            radius,
-            material,
-        }
-    }
-
-    fn root_to_hit_record(&self, root: f32, ray: &Ray) -> HitRecord {
-        let point = ray.at(root);
-        let normal = (point - self.center) / self.radius;
-        let is_front_face = is_front_face(&ray, &normal);
-
-        HitRecord {
-            point,
-            normal: match is_front_face {
-                true => normal,
-                false => -normal,
-            },
-            t: root,
-            front_face: is_front_face,
-            material: self.material.clone(),
-        }
     }
 }

@@ -8,5 +8,3 @@ pub fn sampled_value_to_normalized(val: f32, samples_per_pixel: f32) -> f32 {
     assert!(divided_val <= 1.0 && divided_val >= 0.0);
     divided_val
 }
-
-// TESTS
