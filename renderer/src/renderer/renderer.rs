@@ -1,6 +1,7 @@
 use shared::traits::Render;
 
 use crate::{
+    materials::material::Material,
     math::random::rand_f32,
     scene::scene::Scene,
     shapes::{hit_collection::HitCollection, traits::Hit},

@@ -1,24 +1,26 @@
-use std::rc::Rc;
-
 use super::{
     hit_record::{is_front_face, HitRecord},
     traits::Hit,
 };
-use crate::{materials::material::Material, math::vec3::Vec3, util::ray::Ray};
+use crate::{materials::material::MaterialType, math::vec3::Vec3, util::ray::Ray};
 
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f32,
-    pub material: Rc<dyn Material>,
+    pub material: MaterialType,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f32, material: Rc<dyn Material>) -> Self {
+    pub fn new(center: Vec3, radius: f32, material: MaterialType) -> Self {
         Self {
             center,
             radius,
             material,
         }
+    }
+
+    pub fn new_boxed(center: Vec3, radius: f32, material: MaterialType) -> Box<Self> {
+        Box::new(Self::new(center, radius, material))
     }
 
     fn root_to_hit_record(&self, root: f32, ray: &Ray) -> HitRecord {

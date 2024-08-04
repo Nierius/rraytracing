@@ -10,6 +10,7 @@ use super::{
     scatter_record::ScatterRecord,
 };
 
+#[derive(Clone)]
 pub struct Dielectric {
     pub refraction_index: f32,
 }

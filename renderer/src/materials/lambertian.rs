@@ -6,6 +6,7 @@ use crate::util::ray::Ray;
 use super::material::Material;
 use super::scatter_record::ScatterRecord;
 
+#[derive(Clone)]
 pub struct Lambertian {
     pub albedo: Color,
 }
