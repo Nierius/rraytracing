@@ -1,3 +1,7 @@
+use rayon::iter::IntoParallelIterator;
+
+use rayon::prelude::*;
+use shared::data::Pixel;
 use shared::traits::Render;
 
 use crate::{
@@ -24,12 +28,14 @@ impl Render for Renderer {
         frame_height: i32,
         samples_per_pixel: i16,
     ) -> shared::data::Frame {
-        let mut pixels = vec![];
-        for y in 0..frame_height {
-            for x in 0..frame_width {
-                pixels.push(self.render_pixel(x, y, frame_width, frame_height, samples_per_pixel))
-            }
-        }
+        let pixels: Vec<Pixel> = (0..frame_height)
+            .into_par_iter()
+            .flat_map(|y| {
+                (0..frame_width).into_par_iter().map(move |x| {
+                    return self.render_pixel(x, y, frame_width, frame_height, samples_per_pixel);
+                })
+            })
+            .collect();
 
         shared::data::Frame {
             pixels,
