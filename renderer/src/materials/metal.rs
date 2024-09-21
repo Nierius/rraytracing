@@ -6,6 +6,7 @@ use crate::{
 
 use super::{interactions::reflect, material::Material, scatter_record::ScatterRecord};
 
+#[derive(Clone)]
 pub struct Metal {
     pub albedo: Color,
     pub fuzziness: f32,

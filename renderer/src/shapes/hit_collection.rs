@@ -3,7 +3,7 @@ use crate::util::ray::Ray;
 use super::{hit_record::HitRecord, traits::Hit};
 
 pub struct HitCollection {
-    hittables: Vec<Box<dyn Hit>>,
+    hittables: Vec<Box<dyn Hit + Sync>>,
 }
 
 impl Default for HitCollection {
@@ -36,7 +36,7 @@ impl Hit for HitCollection {
 }
 
 impl HitCollection {
-    pub fn add(&mut self, hittable: Box<dyn Hit>) {
+    pub fn add(&mut self, hittable: Box<dyn Hit + Sync>) {
         self.hittables.push(hittable)
     }
 }
