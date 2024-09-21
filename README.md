@@ -24,7 +24,7 @@ Project uses single monorepo whichs hosts 3 workspaces. Workspaces are shared, g
 - Unit tests
 - Benchmarks
 - Performance improvement
-- Multithreading
+- ~Multithreading~
 - Replace "unwrap()" calls with actual error handling
 - Changing scene from GUI
 - Moving camera in GUI
